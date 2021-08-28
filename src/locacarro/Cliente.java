@@ -12,6 +12,7 @@ import java.util.Date;
 public abstract class Cliente {
 	private String endereco;
 	private String telefone;
+
 	private double divida;
 	private String dataCadastro;
 
@@ -89,4 +90,5 @@ public abstract class Cliente {
 		});
 		pw.close();
 	}
+
 }

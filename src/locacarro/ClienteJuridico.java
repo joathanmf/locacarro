@@ -3,6 +3,7 @@ package locacarro;
 import java.util.Scanner;
 
 public class ClienteJuridico extends Cliente {
+
 	private String nomeFantasia;
 	private String cnpj;
 	private String razaoSocial;
@@ -56,4 +57,5 @@ public class ClienteJuridico extends Cliente {
 		return ("j!" + c.cnpj + "!" + c.nomeFantasia + "!" + c.razaoSocial + "!" + c.getEndereco() + "!"
 				+ c.getTelefone() + "!" + c.getDivida() + "!" + c.getDataCadastro() + "!");
 	}
+
 }
