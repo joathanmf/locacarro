@@ -326,7 +326,7 @@ public class MainMenu {
 	}
 
 	private void limpaTela() {
-		for (int count = 0; count < 10; count++)
+		for (int count = 0; count < 15; count++)
 			System.out.println("");
 	}
 }
