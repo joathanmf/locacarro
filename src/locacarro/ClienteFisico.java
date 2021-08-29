@@ -22,14 +22,30 @@ public class ClienteFisico extends Cliente {
 		return nome;
 	}
 
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
 	public String getCpf() {
 		return cpf;
+	}
+
+	public void setCpf(String cpf) {
+		this.cpf = cpf;
+	}
+
+	@Override
+	public String toString() {
+		return ("Nome: " + this.nome + "\nCPF: " + this.cpf + "\nEndereco: " + this.getEndereco() + "\nTelefone: "
+				+ this.getTelefone() + "\nDívida: " + this.getDivida() + "\nData de Cadastro: "
+				+ this.getDataCadastro());
 	}
 
 	public static Cliente auxLinha(String linha) {
 		Scanner linhaScanner = new Scanner(linha);
 		linhaScanner.useDelimiter("!");
 
+		String f = linhaScanner.next();
 		String cpf = linhaScanner.next();
 		String nome = linhaScanner.next();
 		String endereco = linhaScanner.next();

@@ -36,16 +36,47 @@ public abstract class Cliente {
 		return endereco;
 	}
 
+	public void setEndereco(String endereco) {
+		this.endereco = endereco;
+	}
+
 	public String getTelefone() {
 		return telefone;
+	}
+
+	public void setTelefone(String telefone) {
+		this.telefone = telefone;
 	}
 
 	public double getDivida() {
 		return divida;
 	}
 
+	public void setDivida(double divida) {
+		this.divida = divida;
+	}
+
 	public String getDataCadastro() {
 		return dataCadastro;
+	}
+
+	public void setDataCadastro(String dataCadastro) {
+		this.dataCadastro = dataCadastro;
+	}
+	
+	public static Cliente validaCliente(ArrayList<Cliente> c, String idCliente) {
+		for(Cliente x : c) {
+			if (x instanceof ClienteFisico) {
+				if (idCliente.equals(((ClienteFisico) x).getCpf())) {
+					return x;
+				}
+			} else {
+				if (idCliente.equals(((ClienteJuridico) x).getCnpj())) {
+					return x;
+				}
+			}
+		}
+		return null;
 	}
 
 	public static void abreArquivo(ArrayList<Cliente> c) throws IOException {

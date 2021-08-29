@@ -27,18 +27,38 @@ public class ClienteJuridico extends Cliente {
 		return nomeFantasia;
 	}
 
+	public void setNomeFantasia(String nomeFantasia) {
+		this.nomeFantasia = nomeFantasia;
+	}
+
 	public String getCnpj() {
 		return cnpj;
+	}
+
+	public void setCnpj(String cnpj) {
+		this.cnpj = cnpj;
 	}
 
 	public String getRazaoSocial() {
 		return razaoSocial;
 	}
 
+	public void setRazaoSocial(String razaoSocial) {
+		this.razaoSocial = razaoSocial;
+	}
+
+	@Override
+	public String toString() {
+		return ("Nome: " + this.nomeFantasia + "\nCPF: " + this.cnpj + "\nRazão Social: " + this.razaoSocial
+				+ "\nEndereco: " + this.getEndereco() + "\nTelefone: " + this.getTelefone() + "\nDívida: "
+				+ this.getDivida() + "\nData de Cadastro: " + this.getDataCadastro());
+	}
+
 	public static Cliente auxLinha(String linha) {
 		Scanner linhaScanner = new Scanner(linha);
 		linhaScanner.useDelimiter("!");
 
+		String j = linhaScanner.next();
 		String cnpj = linhaScanner.next();
 		String nomeFantasia = linhaScanner.next();
 		String razaoSocial = linhaScanner.next();
