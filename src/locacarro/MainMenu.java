@@ -6,39 +6,46 @@ import java.util.Scanner;
 
 public class MainMenu {
 	private ArrayList<Cliente> clientes;
+	private ArrayList<Carro> carros;
 
 	public MainMenu() {
 		this.clientes = new ArrayList<>();
+		this.carros = new ArrayList<>();
 	}
 
-	private void abreArquivos(ArrayList<Cliente> c) throws IOException {
-		Cliente.abreArquivo(c);
+	private void abreArquivos(ArrayList<Cliente> cliente, ArrayList<Carro> carro) throws IOException {
+		Cliente.abreArquivo(cliente);
+		Carro.abreArquivo(carro);
 	}
 
-	private void salvaArquivos(ArrayList<Cliente> c) throws IOException {
-		Cliente.salvaArquivo(c);
+	private void salvaArquivos(ArrayList<Cliente> cliente, ArrayList<Carro> carro) throws IOException {
+		Cliente.salvaArquivo(cliente);
+		Carro.salvaArquivo(carro);
 	}
 
 	public void menuPrincipal() throws IOException {
-		this.abreArquivos(this.clientes);
+		this.abreArquivos(this.clientes, this.carros);
 		Scanner leitor = new Scanner(System.in);
 		char escolha;
 
 		do {
+			System.out.println("");
 			System.out.println("[1] Cliente");
+			System.out.println("[2] Carros");
 			System.out.println("[5] SAIR");
 			System.out.print("Escolha uma opção: ");
 			escolha = leitor.nextLine().charAt(0);
 
 			if (escolha == '1') {
 				this.menuCliente();
+			} else if (escolha == '2') {
+				this.menuCarro();
 			} else if (escolha == '5') {
-				this.salvaArquivos(this.clientes);
+				this.salvaArquivos(this.clientes, this.carros);
 			}
 		} while (escolha != '5');
 
-		leitor.close();
-		System.out.println("Arquivos salvos...");
+		System.out.println("\nArquivos salvos...");
 		System.out.println("Programa encerrado...");
 	}
 
@@ -65,7 +72,7 @@ public class MainMenu {
 				this.limpaTela();
 			} else if (escolha == '2') {
 				this.limpaTela();
-				this.mostraRegistros(this.clientes);
+				this.mostraRegistrosCliente(this.clientes);
 				System.out.println("\nAperte ENTER para continuar...");
 				leitor.nextLine();
 				this.limpaTela();
@@ -79,7 +86,7 @@ public class MainMenu {
 				this.limpaTela();
 				System.out.println("\nDigite seu CPF ou CNPJ: ");
 				Cliente cliente = Cliente.validaCliente(clientes, leitor.nextLine());
-				
+
 				if (cliente != null) {
 					System.out.println(cliente);
 				} else {
@@ -96,6 +103,57 @@ public class MainMenu {
 				this.limpaTela();
 			}
 		} while (escolha != '6');
+	}
+
+	private void menuCarro() {
+		Scanner leitor = new Scanner(System.in);
+		char escolha;
+
+		do {
+			this.limpaTela();
+			System.out.println("[1] Cadastrar Carro");
+			System.out.println("[2] Lista de Carros");
+			System.out.println("[3] Editar Cadastro de Carro");
+			System.out.println("[4] Buscar Carro");
+			System.out.println("[5] VOLTAR");
+			System.out.print("Escolha uma opção: ");
+			escolha = leitor.nextLine().charAt(0);
+
+			if (escolha == '1') {
+				this.limpaTela();
+				this.cadastraCarro(this.carros);
+				System.out.println("\nAperte ENTER para continuar...");
+				leitor.nextLine();
+				this.limpaTela();
+			} else if (escolha == '2') {
+				this.limpaTela();
+				this.mostraRegistrosCarro(this.carros);
+				System.out.println("\nAperte ENTER para continuar...");
+				leitor.nextLine();
+				this.limpaTela();
+			} else if (escolha == '3') {
+				this.limpaTela();
+				this.editaCadastroCarro(this.carros);
+				System.out.println("\nAperte ENTER para continuar...");
+				leitor.nextLine();
+				this.limpaTela();
+			} else if (escolha == '4') {
+				this.limpaTela();
+				System.out.print("\nDigite a Placa do Carro: ");
+				Carro carro = Carro.validaCarro(carros, leitor.nextLine());
+				
+				if (carro != null) {
+					System.out.println(carro);
+				} else {
+					System.out.println("Carro não encontrado...");
+				}
+				
+				System.out.println("\nAperte ENTER para continuar...");
+				leitor.nextLine();
+				this.limpaTela();
+			}
+
+		} while (escolha != '5');
 	}
 
 	private void cadastraCliente(ArrayList<Cliente> c) {
@@ -140,7 +198,31 @@ public class MainMenu {
 		}
 	}
 
-	private void mostraRegistros(ArrayList<Cliente> c) {
+	private void cadastraCarro(ArrayList<Carro> c) {
+		Scanner leitor = new Scanner(System.in);
+		System.out.print("Informe a Placa: ");
+		String placa = leitor.nextLine();
+
+		if (Carro.validaCarro(c, placa) == null) {
+			System.out.print("Modelo: ");
+			String modelo = leitor.nextLine();
+			System.out.print("Descrição: ");
+			String descricao = leitor.nextLine();
+			System.out.print("Observações: ");
+			String obs = leitor.nextLine();
+			boolean situacao = true;
+			System.out.print("Ano: ");
+			int ano = leitor.nextInt();
+			System.out.print("Quilometragem: ");
+			double km = leitor.nextDouble();
+			System.out.print("Diária: ");
+			double diaria = leitor.nextDouble();
+
+			c.add(new Carro(placa, ano, modelo, descricao, km, situacao, diaria, obs));
+		}
+	}
+
+	private void mostraRegistrosCliente(ArrayList<Cliente> c) {
 		c.forEach(x -> {
 			System.out.println("------------------------------");
 			System.out.println("Endereço: " + x.getEndereco());
@@ -156,6 +238,13 @@ public class MainMenu {
 				System.out.println("Nome Fantasia: " + ((ClienteJuridico) x).getNomeFantasia());
 				System.out.println("Razão Social: " + ((ClienteJuridico) x).getRazaoSocial());
 			}
+		});
+	}
+
+	private void mostraRegistrosCarro(ArrayList<Carro> c) {
+		c.forEach(x -> {
+			System.out.println("------------------------------");
+			System.out.println(x);
 		});
 	}
 
@@ -177,24 +266,24 @@ public class MainMenu {
 
 				System.out.print("Editar o CPF? [1] Sim [2] Não: ");
 				escolha = leitor.nextLine().charAt(0);
-				this.limpaTela();
+//				this.limpaTela();
 
 				if (escolha == '1') {
 					System.out.println("Seu CPF atual: " + ((ClienteFisico) c).getCpf());
-					System.out.println("Novo CPF: ");
+					System.out.print("Novo CPF: ");
 					((ClienteFisico) c).setCpf(leitor.nextLine());
-					this.limpaTela();
+//					this.limpaTela();
 				}
 
-				System.out.println("Editar seu nome? [1] Sim [2] Não: ");
+				System.out.print("Editar seu nome? [1] Sim [2] Não: ");
 				escolha = leitor.nextLine().charAt(0);
-				this.limpaTela();
+//				this.limpaTela();
 
 				if (escolha == '1') {
 					System.out.println("Seu nome atual: " + ((ClienteFisico) c).getNome());
-					System.out.println("Novo nome: ");
+					System.out.print("Novo nome: ");
 					((ClienteFisico) c).setNome(leitor.nextLine());
-					this.limpaTela();
+//					this.limpaTela();
 				}
 
 				this.editaCadastroClienteAux(c);
@@ -206,35 +295,35 @@ public class MainMenu {
 
 				System.out.print("Editar o CNPJ? [1] Sim [2] Não: ");
 				escolha = leitor.nextLine().charAt(0);
-				this.limpaTela();
+//				this.limpaTela();
 
 				if (escolha == '1') {
 					System.out.println("Seu CNPJ atual: " + ((ClienteJuridico) c).getCnpj());
-					System.out.println("Novo CNPJ: ");
+					System.out.print("Novo CNPJ: ");
 					((ClienteJuridico) c).setCnpj(leitor.nextLine());
-					this.limpaTela();
+//					this.limpaTela();
 				}
 
-				System.out.println("Editar seu nome fantasia? [1] Sim [2] Não: ");
+				System.out.print("Editar seu nome fantasia? [1] Sim [2] Não: ");
 				escolha = leitor.nextLine().charAt(0);
-				this.limpaTela();
+//				this.limpaTela();
 
 				if (escolha == '1') {
 					System.out.println("Seu nome fantasia atual: " + ((ClienteJuridico) c).getNomeFantasia());
-					System.out.println("Novo nome fantasia: ");
+					System.out.print("Novo nome fantasia: ");
 					((ClienteJuridico) c).setNomeFantasia(leitor.nextLine());
-					this.limpaTela();
+//					this.limpaTela();
 				}
 
 				System.out.println("Editar a razão social? [1] Sim [2] Não: ");
 				escolha = leitor.nextLine().charAt(0);
-				this.limpaTela();
+//				this.limpaTela();
 
 				if (escolha == '1') {
 					System.out.println("Sua razão social atual: " + ((ClienteJuridico) c).getRazaoSocial());
-					System.out.println("Nova razão social: ");
+					System.out.print("Nova razão social: ");
 					((ClienteJuridico) c).setRazaoSocial(leitor.nextLine());
-					this.limpaTela();
+//					this.limpaTela();
 				}
 
 				this.editaCadastroClienteAux(c);
@@ -250,67 +339,167 @@ public class MainMenu {
 
 		System.out.print("Editar seu endereço? [1] Sim [2] Não: ");
 		char escolha = leitor.nextLine().charAt(0);
-		this.limpaTela();
+//		this.limpaTela();
 
 		if (escolha == '1') {
 			System.out.println("Seu endereço atual: " + c.getEndereco());
 			System.out.print("Novo endereço: ");
 			c.setEndereco(leitor.nextLine());
-			this.limpaTela();
+//			this.limpaTela();
 		}
 
 		System.out.print("Editar seu telefone? [1] Sim [2] Não: ");
 		escolha = leitor.nextLine().charAt(0);
-		this.limpaTela();
+//		this.limpaTela();
 
 		if (escolha == '1') {
 			System.out.println("Seu telefone atual: " + c.getTelefone());
 			System.out.print("Novo telefone: ");
 			c.setTelefone(leitor.nextLine());
-			this.limpaTela();
+//			this.limpaTela();
 		}
 
 		System.out.print("Editar a dívida? [1] Sim [2] Não: ");
 		escolha = leitor.nextLine().charAt(0);
-		this.limpaTela();
+//		this.limpaTela();
 
 		if (escolha == '1') {
 			System.out.println("Sua dívida atual: R$" + c.getDivida());
 			System.out.print("Nova dívida: ");
 			c.setDivida(leitor.nextDouble());
-			this.limpaTela();
+//			this.limpaTela();
 		}
 	}
 	
+	private void editaCadastroCarro(ArrayList<Carro> carro) {
+		Scanner scan = new Scanner(System.in);
+		System.out.print("Digite a Placa do Carro: ");
+		String placa = scan.nextLine();
+		
+		Carro c = Carro.validaCarro(carro, placa);
+		
+		if (c != null) {
+			Scanner leitor = new Scanner(System.in);
+			System.out.println("------------------------------");
+			System.out.println(c);
+			System.out.println("------------------------------");
+			
+			System.out.print("Editar a placa? [1] Sim [2] Não: ");
+			char escolha = leitor.nextLine().charAt(0);
+			
+			if (escolha == '1') {
+				System.out.println("Placa atual: " + c.getPlaca());
+				System.out.print("Nova placa: ");
+				c.setPlaca(leitor.nextLine());
+			}
+			
+			System.out.print("Editar ano? [1] Sim [2] Não: ");
+			escolha = leitor.nextLine().charAt(0);
+			
+			if (escolha == '1') {
+				System.out.println("Ano atual: " + c.getAno());
+				System.out.print("Novo ano: ");
+				c.setAno(leitor.nextInt());
+			}
+			
+			System.out.print("Editar modelo? [1] Sim [2] Não: ");
+			escolha = leitor.nextLine().charAt(0);
+			
+			if (escolha == '1') {
+				System.out.println("Modelo atual: " + c.getModelo());
+				System.out.print("Novo modelo: ");
+				c.setModelo(leitor.nextLine());
+			}
+			
+			System.out.print("Editar descrição? [1] Sim [2] Não: ");
+			escolha = leitor.nextLine().charAt(0);
+			
+			if (escolha == '1') {
+				System.out.println("Descrição atual: " + c.getDescricao());
+				System.out.print("Nova descrição: ");
+				c.setDescricao(leitor.nextLine());
+			}
+			
+			System.out.print("Editar quilometragem? [1] Sim [2] Não: ");
+			escolha = leitor.nextLine().charAt(0);
+			
+			if (escolha == '1') {
+				System.out.println("Quilometragem atual: " + c.getKm());
+				System.out.print("Nova quilometragem: ");
+				c.setKm(leitor.nextDouble());
+			}
+			
+			System.out.print("Editar situação? [1] Sim [2] Não: ");
+			escolha = leitor.nextLine().charAt(0);
+			
+			if (escolha == '1') {
+				if (c.isSituacao()) {
+					System.out.println("Situacao atual: Disponível");
+				} else {
+					System.out.println("Situacao atual: Não Disponível");
+				}
+				
+				System.out.print("Nova situação: [1] Disponível [2] Não Disponível");
+				escolha = leitor.nextLine().charAt(0);
+				
+				if (escolha == '1') {
+					c.setSituacao(true);
+				} else {
+					c.setSituacao(false);
+				}
+			}
+			
+			System.out.print("Editar diaria? [1] Sim [2] Não: ");
+			escolha = leitor.nextLine().charAt(0);
+			
+			if (escolha == '1') {
+				System.out.println("Diária atual: " + c.getDiaria());
+				System.out.print("Nova diária: ");
+				c.setDiaria(leitor.nextDouble());
+			}
+			
+			System.out.print("Editar observações? [1] Sim [2] Não: ");
+			escolha = leitor.nextLine().charAt(0);
+			
+			if (escolha == '1') {
+				System.out.println("Observações atuais: " + c.getObservacoes());
+				System.out.print("Nova observação: ");
+				c.setObservacoes(leitor.nextLine());
+			}
+		} else {
+			System.out.println("Carro não encontrado...");
+		}
+	}
+
 	private void quitaDebitosCliente(ArrayList<Cliente> cliente) {
 		Scanner scan = new Scanner(System.in);
 		System.out.print("Digite seu CPF ou CNPJ: ");
 		String idCliente = scan.nextLine();
 
 		Cliente c = (Cliente) ClienteFisico.validaCliente(cliente, idCliente);
-		
+
 		if (c == null) {
 			c = (Cliente) ClienteJuridico.validaCliente(cliente, idCliente);
 		}
-		
+
 		if ((c != null) && (c.getDivida() > 0.0)) {
 			System.out.println("------------------------------");
 			System.out.println(c);
 			System.out.println("------------------------------");
-			
+
 			char escolha;
 			Scanner leitor = new Scanner(System.in);
 			System.out.println("Pagar dívida? [1] Sim [2] Não: ");
 			escolha = leitor.nextLine().charAt(0);
-							
+
 			if (escolha == '1') {
 				double divida = c.getDivida();
 				System.out.println("Dívida atual: " + divida);
 				System.out.print("Total a pagar: ");
 				double totalPagar = leitor.nextDouble();
-				
+
 				divida -= totalPagar;
-				
+
 				if (divida <= 0) {
 					System.out.println("Troco: R$ " + -divida);
 					c.setDivida(0.0);
