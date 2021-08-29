@@ -61,5 +61,6 @@ public class ClienteFisico extends Cliente {
 	public static String getStringToSave(ClienteFisico c) {
 		return ("f!" + c.cpf + "!" + c.nome + "!" + c.getEndereco() + "!" + c.getTelefone() + "!" + c.getDivida() + "!"
 				+ c.getDataCadastro() + "!");
+
 	}
 }
