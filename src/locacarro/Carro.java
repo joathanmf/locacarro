@@ -17,10 +17,11 @@ public class Carro implements ValorDiaria {
 	private double km;
 	private boolean situacao;
 	private double diaria;
+	private double taxaDistancia;
 	private String observacoes;
 
 	public Carro(String placa, int ano, String modelo, String descricao, double km, boolean situacao, double diaria,
-			String observacoes) {
+			double taxaDistancia, String observacoes) {
 		this.placa = placa.toUpperCase();
 		this.ano = ano;
 		this.modelo = modelo;
@@ -28,6 +29,7 @@ public class Carro implements ValorDiaria {
 		this.km = km;
 		this.situacao = situacao;
 		this.diaria = calculaValorDiaria(diaria);
+		this.taxaDistancia = taxaDistancia;
 		this.observacoes = observacoes;
 	}
 
@@ -46,13 +48,14 @@ public class Carro implements ValorDiaria {
 			this.situacao = false;
 		}
 		this.diaria = Double.parseDouble(linhaScanner.next());
+		this.taxaDistancia = Double.parseDouble(linhaScanner.next());
 		this.observacoes = linhaScanner.next();
 	}
-	
+
 	@Override
 	public double calculaValorDiaria(double diaria) {
 		int anoAtual = Calendar.getInstance().get(Calendar.YEAR);
-		
+
 		if (anoAtual - this.ano == 0) {
 			diaria = diaria * 1.5;
 		} else if (anoAtual - this.ano == 2 || anoAtual - this.ano == 1) {
@@ -117,6 +120,14 @@ public class Carro implements ValorDiaria {
 		this.diaria = calculaValorDiaria(diaria);
 	}
 
+	public double getTaxaDistancia() {
+		return taxaDistancia;
+	}
+
+	public void setTaxaDistancia(double taxaDistancia) {
+		this.taxaDistancia = taxaDistancia;
+	}
+
 	public String getObservacoes() {
 		return observacoes;
 	}
@@ -134,14 +145,15 @@ public class Carro implements ValorDiaria {
 		} else {
 			str += "\nSituação: Não Disponível";
 		}
-		str += ("\nDiária: " + this.diaria + "\nObservações: " + this.observacoes);
-		
+		str += ("\nDiária: " + this.diaria + "\nTaxa Distância: " + this.getTaxaDistancia() + "\nObservações: "
+				+ this.observacoes);
+
 		return str;
 	}
-	
+
 	public static Carro validaCarro(ArrayList<Carro> c, String placa) {
-		for(Carro x : c) {
-			if (x.getPlaca().equals(placa.toUpperCase())) {
+		for (Carro x : c) {
+			if (placa.toUpperCase().equals(x.getPlaca())) {
 				return x;
 			}
 		}
@@ -178,7 +190,8 @@ public class Carro implements ValorDiaria {
 		}
 		c.forEach(x -> {
 			pw.println(x.getPlaca() + "!" + x.getAno() + "!" + x.getModelo() + "!" + x.getDescricao() + "!" + x.getKm()
-					+ "!" + x.isSituacao() + "!" + x.getDiaria() + "!" + x.getObservacoes());
+					+ "!" + x.isSituacao() + "!" + x.getDiaria() + "!" + x.getTaxaDistancia() + "!"
+					+ x.getObservacoes());
 		});
 		pw.close();
 	}

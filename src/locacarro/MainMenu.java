@@ -7,24 +7,28 @@ import java.util.Scanner;
 public class MainMenu {
 	private ArrayList<Cliente> clientes;
 	private ArrayList<Carro> carros;
+	private ArrayList<Aluguel> alugueis;
 
 	public MainMenu() {
 		this.clientes = new ArrayList<>();
 		this.carros = new ArrayList<>();
+		this.alugueis = new ArrayList<>();
 	}
 
-	private void abreArquivos(ArrayList<Cliente> cliente, ArrayList<Carro> carro) throws IOException {
+	private void abreArquivos(ArrayList<Cliente> cliente, ArrayList<Carro> carro, ArrayList<Aluguel> aluguel) throws IOException {
 		Cliente.abreArquivo(cliente);
 		Carro.abreArquivo(carro);
+		Aluguel.abreArquivo(aluguel);
 	}
 
-	private void salvaArquivos(ArrayList<Cliente> cliente, ArrayList<Carro> carro) throws IOException {
+	private void salvaArquivos(ArrayList<Cliente> cliente, ArrayList<Carro> carro, ArrayList<Aluguel> aluguel) throws IOException {
 		Cliente.salvaArquivo(cliente);
 		Carro.salvaArquivo(carro);
+		Aluguel.salvaArquivo(aluguel);
 	}
 
-	public void menuPrincipal() throws IOException {
-		this.abreArquivos(this.clientes, this.carros);
+	public void menuPrincipal() throws Exception {
+		this.abreArquivos(this.clientes, this.carros, this.alugueis);
 		Scanner leitor = new Scanner(System.in);
 		char escolha;
 
@@ -32,6 +36,7 @@ public class MainMenu {
 			System.out.println("");
 			System.out.println("[1] Cliente");
 			System.out.println("[2] Carros");
+			System.out.println("[3] Aluguel");
 			System.out.println("[5] SAIR");
 			System.out.print("Escolha uma opção: ");
 			escolha = leitor.nextLine().charAt(0);
@@ -40,8 +45,10 @@ public class MainMenu {
 				this.menuCliente();
 			} else if (escolha == '2') {
 				this.menuCarro();
+			} else if (escolha == '3') {
+				this.menuAluguel();
 			} else if (escolha == '5') {
-				this.salvaArquivos(this.clientes, this.carros);
+				this.salvaArquivos(this.clientes, this.carros, this.alugueis);
 			}
 		} while (escolha != '5');
 
@@ -155,6 +162,78 @@ public class MainMenu {
 
 		} while (escolha != '5');
 	}
+	
+	private void menuAluguel() throws Exception {
+		Scanner leitor = new Scanner(System.in);
+		char escolha;
+
+		do {
+			this.limpaTela();
+			System.out.println("[1] Alugar");
+			System.out.println("[2] Devolver");
+			System.out.println("[3] Lista de Aluguéis Ativos");
+			System.out.println("[4] Histórico de Aluguéis");
+			System.out.println("[5] VOLTAR");
+			System.out.print("Escolha uma opção: ");
+			escolha = leitor.nextLine().charAt(0);
+			
+			if (escolha == '1') {
+				this.limpaTela();
+				if (this.carros.size() != 0) {
+					Aluguel al = new Aluguel();
+					al.alugar(this.clientes, this.carros, this.alugueis);
+				} else {
+					System.out.println("Não há carros disponíveis...");
+				}
+				System.out.println("\nAperte ENTER para continuar...");
+				leitor.nextLine();
+				this.limpaTela();
+			} else if (escolha == '2') {
+				this.limpaTela();
+				Aluguel al = new Aluguel();
+				System.out.print("Digite seu CPF ou CNPJ: ");
+				String idCliente = leitor.nextLine();
+				Cliente cl = Cliente.validaCliente(this.clientes, idCliente);
+				
+				if (cl != null) {
+					System.out.print("Pagar? [1] Sim [2] Não: ");
+					escolha = leitor.nextLine().charAt(0);
+					
+					if (escolha == '1') {
+						al.devolucao(this.clientes, this.carros, this.alugueis, idCliente, true);
+					} else {
+						al.devolucao(this.clientes, this.carros, this.alugueis, idCliente, false);
+					}
+				} else {
+					System.out.println("Digitou errado ou não está na base de dados...");
+				}
+				System.out.println("\nAperte ENTER para continuar...");
+				leitor.nextLine();
+				this.limpaTela();
+			} else if (escolha == '3') {
+				this.limpaTela();
+				alugueis.forEach(x -> {
+					if (x.isSituacao()) {
+						System.out.println("------------------------------");
+						System.out.println(x);
+					}
+				});
+				System.out.println("\nAperte ENTER para continuar...");
+				leitor.nextLine();
+				this.limpaTela();
+			} else if (escolha == '4') {
+				this.limpaTela();
+				alugueis.forEach(x -> {
+					System.out.println("------------------------------");
+					System.out.println(x);
+				});
+				System.out.println("\nAperte ENTER para continuar...");
+				leitor.nextLine();
+				this.limpaTela();
+			}
+			
+		} while (escolha != '5');
+	}
 
 	private void cadastraCliente(ArrayList<Cliente> c) {
 		System.out.print("Digite seu CPF ou CNPJ: ");
@@ -217,12 +296,14 @@ public class MainMenu {
 			double km = leitor.nextDouble();
 			System.out.print("Diária: ");
 			double diaria = leitor.nextDouble();
+			System.out.print("Taxa Distância: ");
+			double taxa = leitor.nextDouble();
 
-			c.add(new Carro(placa, ano, modelo, descricao, km, situacao, diaria, obs));
+			c.add(new Carro(placa, ano, modelo, descricao, km, situacao, diaria, taxa, obs));
 		}
 	}
 
-	private void mostraRegistrosCliente(ArrayList<Cliente> c) {
+	public void mostraRegistrosCliente(ArrayList<Cliente> c) {
 		c.forEach(x -> {
 			System.out.println("------------------------------");
 			System.out.println("Endereço: " + x.getEndereco());
@@ -241,8 +322,15 @@ public class MainMenu {
 		});
 	}
 
-	private void mostraRegistrosCarro(ArrayList<Carro> c) {
+	public void mostraRegistrosCarro(ArrayList<Carro> c) {
 		c.forEach(x -> {
+			System.out.println("------------------------------");
+			System.out.println(x);
+		});
+	}
+	
+	public void mostraRegistrosAluguel(ArrayList<Aluguel> a) {
+		a.forEach(x -> {
 			System.out.println("------------------------------");
 			System.out.println(x);
 		});
@@ -266,24 +354,20 @@ public class MainMenu {
 
 				System.out.print("Editar o CPF? [1] Sim [2] Não: ");
 				escolha = leitor.nextLine().charAt(0);
-//				this.limpaTela();
 
 				if (escolha == '1') {
 					System.out.println("Seu CPF atual: " + ((ClienteFisico) c).getCpf());
 					System.out.print("Novo CPF: ");
 					((ClienteFisico) c).setCpf(leitor.nextLine());
-//					this.limpaTela();
 				}
 
 				System.out.print("Editar seu nome? [1] Sim [2] Não: ");
 				escolha = leitor.nextLine().charAt(0);
-//				this.limpaTela();
 
 				if (escolha == '1') {
 					System.out.println("Seu nome atual: " + ((ClienteFisico) c).getNome());
 					System.out.print("Novo nome: ");
 					((ClienteFisico) c).setNome(leitor.nextLine());
-//					this.limpaTela();
 				}
 
 				this.editaCadastroClienteAux(c);
@@ -295,35 +379,29 @@ public class MainMenu {
 
 				System.out.print("Editar o CNPJ? [1] Sim [2] Não: ");
 				escolha = leitor.nextLine().charAt(0);
-//				this.limpaTela();
 
 				if (escolha == '1') {
 					System.out.println("Seu CNPJ atual: " + ((ClienteJuridico) c).getCnpj());
 					System.out.print("Novo CNPJ: ");
 					((ClienteJuridico) c).setCnpj(leitor.nextLine());
-//					this.limpaTela();
 				}
 
 				System.out.print("Editar seu nome fantasia? [1] Sim [2] Não: ");
 				escolha = leitor.nextLine().charAt(0);
-//				this.limpaTela();
 
 				if (escolha == '1') {
 					System.out.println("Seu nome fantasia atual: " + ((ClienteJuridico) c).getNomeFantasia());
 					System.out.print("Novo nome fantasia: ");
 					((ClienteJuridico) c).setNomeFantasia(leitor.nextLine());
-//					this.limpaTela();
 				}
 
 				System.out.println("Editar a razão social? [1] Sim [2] Não: ");
 				escolha = leitor.nextLine().charAt(0);
-//				this.limpaTela();
 
 				if (escolha == '1') {
 					System.out.println("Sua razão social atual: " + ((ClienteJuridico) c).getRazaoSocial());
 					System.out.print("Nova razão social: ");
 					((ClienteJuridico) c).setRazaoSocial(leitor.nextLine());
-//					this.limpaTela();
 				}
 
 				this.editaCadastroClienteAux(c);
@@ -339,35 +417,29 @@ public class MainMenu {
 
 		System.out.print("Editar seu endereço? [1] Sim [2] Não: ");
 		char escolha = leitor.nextLine().charAt(0);
-//		this.limpaTela();
 
 		if (escolha == '1') {
 			System.out.println("Seu endereço atual: " + c.getEndereco());
 			System.out.print("Novo endereço: ");
 			c.setEndereco(leitor.nextLine());
-//			this.limpaTela();
 		}
 
 		System.out.print("Editar seu telefone? [1] Sim [2] Não: ");
 		escolha = leitor.nextLine().charAt(0);
-//		this.limpaTela();
 
 		if (escolha == '1') {
 			System.out.println("Seu telefone atual: " + c.getTelefone());
 			System.out.print("Novo telefone: ");
 			c.setTelefone(leitor.nextLine());
-//			this.limpaTela();
 		}
 
 		System.out.print("Editar a dívida? [1] Sim [2] Não: ");
 		escolha = leitor.nextLine().charAt(0);
-//		this.limpaTela();
 
 		if (escolha == '1') {
 			System.out.println("Sua dívida atual: R$" + c.getDivida());
 			System.out.print("Nova dívida: ");
 			c.setDivida(leitor.nextDouble());
-//			this.limpaTela();
 		}
 	}
 	
