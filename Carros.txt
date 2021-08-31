@@ -1,3 +1,3 @@
-123QWER!2015!Gol!Gol!54000.0!false!25.0!1.9!GOl
-NKN0077!2021!Gol!Ta amassado!100000.0!false!1.875!1.0!Ja coloquei na descrição
-QWE1234!2019!Caminhão Pipa!Tem hágua!700.0!false!12.0!1.6!Chei d'água
+123QWER!2015!Gol!Gol!54000.0!true!25.0!1.9!GOl
+NKN0077!2021!Gol!Ta amassado!101000.0!true!10!1.0!Ja coloquei na descrição
+QWE1234!2019!Caminhão Pipa!Tem hágua!1500.0!true!12.0!1.6!Chei d'água
