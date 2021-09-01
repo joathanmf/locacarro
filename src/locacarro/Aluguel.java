@@ -262,36 +262,76 @@ public class Aluguel {
 	}
 
 	public static void mostraCarrosAlugadosPorPeriodo(ArrayList<Cliente> cliente, ArrayList<Carro> carro,
-			ArrayList<Aluguel> aluguel) {
+			ArrayList<Aluguel> aluguel) throws Exception {
 		Scanner leitor = new Scanner(System.in);
 		System.out.print("Informe a data inicial (dd/mm/aaaa): ");
 		String dataInicio = leitor.nextLine();
 
-		int i = 0;
+		System.out.print("Informe a data final (dd/mm/aaaa): ");
+		String dataFim = leitor.nextLine();
 
-		while (i < aluguel.size()) {
-			if (aluguel.get(i).getDataInicio().equals(dataInicio)) {
-				break;
-			}
-			i++;
-		}
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		Date dt1 = sdf.parse(dataInicio);
+		Date dt2 = sdf.parse(dataFim);
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(dt1);
 
-		if (i < aluguel.size()) {
-			int flag = 0;
-			System.out.print("Informe a data final (dd/mm/aaaa): ");
-			String dataFim = leitor.nextLine();
-
-			Cliente cl;
-			Carro ca;
-
-			while (i < aluguel.size()) {
-				if (!(aluguel.get(i).getDataInicio().equals(dataFim))
-						|| Integer.parseInt(aluguel.get(i).getDataInicio().substring(6, 10)) <= Integer
-								.parseInt(dataFim.substring(6, 10))) {
-
+		for (Date dt = dt1; dt.compareTo(dt2) <= 0;) {
+			for (Aluguel x : aluguel) {
+				Date daf = sdf.parse(x.getDataInicio());
+				if (daf.compareTo(dt) == 0) {
+					Cliente cl = Cliente.validaCliente(cliente, x.getIdCliente());
+					Carro ca = Carro.validaCarro(carro, x.getIdCarro());
+					
+					if ((cl != null) && (ca != null)) {
+						System.out.println("------------------------------");
+						if (cl instanceof ClienteFisico) {
+							System.out.println("Cliente: " + ((ClienteFisico) cl).getNome());
+							System.out.println("CPF: " + ((ClienteFisico) cl).getCpf());
+						} else {
+							System.out.println("Cliente: " + ((ClienteJuridico) cl).getRazaoSocial());
+							System.out.println("CNPJ: " + ((ClienteJuridico) cl).getCnpj());
+						}
+						System.out.println("Carro: " + ca.getModelo() + " " + ca.getAno());
+						System.out.println("Placa: " + ca.getPlaca());
+						System.out.println("\nData do Aluguel: " + x.getDataInicio());
+					}
 				}
 			}
+
+			cal.add(Calendar.DATE, +1);
+			dt = cal.getTime();
 		}
+	}
+
+	public static void mostraFaturamentoPorPeriodo(ArrayList<Aluguel> aluguel) throws Exception {
+		Scanner leitor = new Scanner(System.in);
+		System.out.print("Informe a data inicial (dd/mm/aaaa): ");
+		String dataInicio = leitor.nextLine();
+
+		System.out.print("Informe a data final (dd/mm/aaaa): ");
+		String dataFim = leitor.nextLine();
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		Date dt1 = sdf.parse(dataInicio);
+		Date dt2 = sdf.parse(dataFim);
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(dt1);
+
+		double somaFaturamento = 0.0;
+
+		for (Date dt = dt1; dt.compareTo(dt2) <= 0;) {
+			for (Aluguel x : aluguel) {
+				Date daf = sdf.parse(x.getDataInicio());
+				if (daf.compareTo(dt) == 0) {
+					somaFaturamento += x.getDividaValor();
+				}
+			}
+			cal.add(Calendar.DATE, +1);
+			dt = cal.getTime();
+		}
+
+		System.out.println("\nFaturamento no período informado: R$ " + somaFaturamento);
 	}
 
 	public int diasEntreDatas() throws Exception {

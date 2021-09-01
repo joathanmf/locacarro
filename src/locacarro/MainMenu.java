@@ -240,7 +240,7 @@ public class MainMenu {
 		} while (escolha != '5');
 	}
 
-	private void menuRelatorio() {
+	private void menuRelatorio() throws Exception {
 		Scanner leitor = new Scanner(System.in);
 		char escolha;
 
@@ -250,6 +250,7 @@ public class MainMenu {
 			System.out.println("[2] Faturamento por Período");//
 			System.out.println("[3] Clientes Devedores");
 			System.out.println("[4] VOLTAR");
+			System.out.print("Escolha uma opção: ");
 			escolha = leitor.nextLine().charAt(0);
 
 			if (escolha == '1') {
