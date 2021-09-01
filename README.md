@@ -1,7 +1,7 @@
 # Locacarro
 
 - Software simplificado para gestão e aluguel de carros
-- Feito com muito ódio no coração
+- Feito com muito amor no coração
 - Autores: Joathan, Lucas e Flores
-- Infelizmente Java
+- Simplesmente Java
 - Tchau...
