@@ -37,7 +37,7 @@ public class Aluguel {
 		this.idCarro = idCarro.toUpperCase();
 		this.tipoAluguel = tipoAluguel;
 		this.situacao = true;
-		
+
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		Date dataAtual = new Date();
 		this.dataInicio = sdf.format(dataAtual);
@@ -161,17 +161,17 @@ public class Aluguel {
 	public void devolucao(ArrayList<Cliente> cliente, ArrayList<Carro> carro, ArrayList<Aluguel> aluguel,
 			String idCliente, boolean vaiPagar) throws Exception {
 		Cliente cl = Cliente.validaCliente(cliente, idCliente);
-		
+
 		System.out.println("------------------------------");
 		System.out.println(cl);
 		System.out.println("");
-		
+
 		Scanner leitor = new Scanner(System.in);
 
 		System.out.print("Quilometragem atual do carro: ");
 		double kmsAtual = leitor.nextDouble();
 
-		if (cl != null) {			
+		if (cl != null) {
 			for (Aluguel x : aluguel) {
 				if (idCliente.equals(x.idCliente) && x.situacao == true) {
 					System.out.println("------------------------------");
@@ -184,7 +184,7 @@ public class Aluguel {
 			System.out.print("Placa do carro à devolver: ");
 			String placa = leitor.nextLine();
 			Carro ca = Carro.validaCarro(carro, placa);
-			
+
 			System.out.println("------------------------------");
 			System.out.println(ca);
 			System.out.println("");
@@ -201,16 +201,16 @@ public class Aluguel {
 						x.setDataFim(sdf.format(agora));
 
 						kms = kmsAtual - ca.getKm();
-						
+
 						if (x.isTipoAluguel()) {
 							divida = ca.getDiaria() * x.diasEntreDatas();
 						} else {
 							divida = kms * ca.getTaxaDistancia();
 						}
-						
+
 						ca.setKm(kmsAtual);
 						ca.setSituacao(true);
-						
+
 						double auxDivida = 0.0;
 
 						x.setDividaValor(divida);
@@ -229,12 +229,12 @@ public class Aluguel {
 								System.out.println("Dívida totalmente paga...");
 								x.setSituacao(false);
 							} else {
-								cl.setDivida(divida+auxDivida);
+								cl.setDivida(divida + auxDivida);
 							}
 						} else {
-							cl.setDivida(divida+auxDivida);
+							cl.setDivida(divida + auxDivida);
 						}
-						
+
 						emitirRecibo(cl, ca, x, kms);
 					}
 				}
@@ -245,7 +245,7 @@ public class Aluguel {
 			System.out.println("Cliente não existe...");
 		}
 	}
-	
+
 	private void emitirRecibo(Cliente cliente, Carro carro, Aluguel aluguel, double kms) throws Exception {
 		System.out.println("\n---------- Recibo ------------\n");
 		if (cliente instanceof ClienteFisico) {
@@ -259,6 +259,39 @@ public class Aluguel {
 		System.out.println("Placa do carro: " + carro.getPlaca());
 		System.out.println("\nValor: R$ " + aluguel.getDividaValor());
 		System.out.println("------------------------------");
+	}
+
+	public static void mostraCarrosAlugadosPorPeriodo(ArrayList<Cliente> cliente, ArrayList<Carro> carro,
+			ArrayList<Aluguel> aluguel) {
+		Scanner leitor = new Scanner(System.in);
+		System.out.print("Informe a data inicial (dd/mm/aaaa): ");
+		String dataInicio = leitor.nextLine();
+
+		int i = 0;
+
+		while (i < aluguel.size()) {
+			if (aluguel.get(i).getDataInicio().equals(dataInicio)) {
+				break;
+			}
+			i++;
+		}
+
+		if (i < aluguel.size()) {
+			int flag = 0;
+			System.out.print("Informe a data final (dd/mm/aaaa): ");
+			String dataFim = leitor.nextLine();
+
+			Cliente cl;
+			Carro ca;
+
+			while (i < aluguel.size()) {
+				if (!(aluguel.get(i).getDataInicio().equals(dataFim))
+						|| Integer.parseInt(aluguel.get(i).getDataInicio().substring(6, 10)) <= Integer
+								.parseInt(dataFim.substring(6, 10))) {
+
+				}
+			}
+		}
 	}
 
 	public int diasEntreDatas() throws Exception {
@@ -287,7 +320,7 @@ public class Aluguel {
 		} else {
 			str += "Distância";
 		}
-		
+
 		str += ("\nValor: " + this.dividaValor);
 
 		return str;

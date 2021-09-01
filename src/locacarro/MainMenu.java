@@ -109,7 +109,7 @@ public class MainMenu {
 				this.limpaTela();
 			} else if (escolha == '5') {
 				this.limpaTela();
-				this.quitaDebitosCliente(this.clientes);
+				this.quitaDebitosCliente(this.clientes, this.alugueis);
 				System.out.println("\nAperte ENTER para continuar...");
 				leitor.nextLine();
 				this.limpaTela();
@@ -248,17 +248,28 @@ public class MainMenu {
 			this.limpaTela();
 			System.out.println("[1] Carros Alugados por Período");//
 			System.out.println("[2] Faturamento por Período");//
-			System.out.println("[3] Clientes Devedores");//
+			System.out.println("[3] Clientes Devedores");
 			System.out.println("[4] VOLTAR");
 			escolha = leitor.nextLine().charAt(0);
 
 			if (escolha == '1') {
-
+				this.limpaTela();
+				Aluguel.mostraCarrosAlugadosPorPeriodo(this.clientes, this.carros, this.alugueis);
+				System.out.println("\nAperte ENTER para continuar...");
+				leitor.nextLine();
+				this.limpaTela();
 			} else if (escolha == '2') {
-
+				this.limpaTela();
+				Aluguel.mostraFaturamentoPorPeriodo(this.alugueis);
+				System.out.println("\nAperte ENTER para continuar...");
+				leitor.nextLine();
+				this.limpaTela();
 			} else if (escolha == '3') {
 				this.limpaTela();
-				this.mostraDevedores(this.clientes, this.carros, this.alugueis);
+				this.mostraDevedores(this.clientes);
+				System.out.println("\nAperte ENTER para continuar...");
+				leitor.nextLine();
+				this.limpaTela();
 			}
 
 		} while (escolha != '4');
@@ -572,7 +583,7 @@ public class MainMenu {
 		}
 	}
 
-	private void quitaDebitosCliente(ArrayList<Cliente> cliente) {
+	private void quitaDebitosCliente(ArrayList<Cliente> cliente, ArrayList<Aluguel> aluguel) {
 		Scanner scan = new Scanner(System.in);
 		System.out.print("Digite seu CPF ou CNPJ: ");
 		String idCliente = scan.nextLine();
@@ -590,27 +601,50 @@ public class MainMenu {
 
 			char escolha;
 			Scanner leitor = new Scanner(System.in);
-			System.out.println("Pagar dívida? [1] Sim [2] Não: ");
+			System.out.print("Pagar dívida? [1] Sim [2] Não: ");
 			escolha = leitor.nextLine().charAt(0);
 
 			if (escolha == '1') {
-				double divida = c.getDivida();
-				System.out.println("Dívida atual: " + divida);
-				System.out.print("Total a pagar: ");
-				double totalPagar = leitor.nextDouble();
+				aluguel.forEach(al -> {
+					if (al.getIdCliente().equals(idCliente) && al.isSituacao()) {
+						System.out.println("------------------------------");
+						System.out.println(al);
+					}
+				});
 
-				double d = divida;
+				System.out.print("\nEscolha a placa para quitar a dívida: ");
+				String placa = leitor.nextLine();
 
-				divida -= totalPagar;
+				double divida, d, auxDivida;
 
-				if (divida <= 0) {
-					System.out.println("Troco: R$ " + -divida);
-					c.setDivida(0.0);
-				} else {
-					c.setDivida(divida);
+				for (Aluguel al : aluguel) {
+					if (placa.toUpperCase().equals(al.getIdCarro()) && al.isSituacao()) {
+						divida = al.getDividaValor();
+						double totalPagar;
+						
+						do {
+							System.out.println("Dívida atual: R$ " + divida);
+							System.out.print("Pagamento (À vista): R$ ");
+							totalPagar = leitor.nextDouble();
+	
+							d = divida;
+							
+						} while (totalPagar < d);
+							
+						divida -= totalPagar;
+
+						auxDivida = c.getDivida();
+
+						if (divida <= 0) {
+							System.out.println("Troco: R$ " + -divida);
+							c.setDivida(auxDivida-d);
+							System.out.println("Dívida totalmente paga...");
+							al.setSituacao(false);
+						}
+						
+						emitirRecibo(c, d);
+					}
 				}
-
-				emitirRecibo(c, d);
 			}
 		} else if (c == null) {
 			System.out.println("Cliente não encontrado...");
@@ -618,40 +652,21 @@ public class MainMenu {
 			System.out.println("Cliente sem dívidas...");
 		}
 	}
-	
-	private void mostraDevedores(ArrayList<Cliente> cl, ArrayList<Carro> ca, ArrayList<Aluguel> al) {
-//		this.clientes.forEach(cl -> {
-//			if (cl.getDivida() > 0.0) {
-//				System.out.println("------------------------------");
-//				if (cl instanceof ClienteFisico) {
-//					System.out.println("Cliente: " + ((ClienteFisico) cl).getNome());
-//					System.out.println("CPF: " + ((ClienteFisico) cl).getCpf());
-//				} else {
-//					System.out.println("Cliente: " + ((ClienteJuridico) cl).getRazaoSocial());
-//					System.out.println("CNPJ: " + ((ClienteJuridico) cl).getCnpj());
-//				}
-//				this.alugueis.forEach(al -> {
-//					System.out.println("Dívida: R$ " + al.getDividaValor());
-//					this.carros.forEach(ca -> {
-//						if (cl instanceof ClienteFisico) {
-//							if (al.getIdCliente().equals(((ClienteFisico) cl).getCpf())) {
-//								if (al.getIdCarro().equals(ca.getPlaca())) {
-//									System.out.println("Carro: " + ca.getModelo() + " " + ca.getAno());
-//									System.out.println("Placa: " + ca.getPlaca());
-//								}
-//							}
-//						} else {
-//							if (al.getIdCliente().equals(((ClienteJuridico) cl).getCnpj())) {
-//								if (al.getIdCarro().equals(ca.getPlaca())) {
-//									System.out.println("Carro: " + ca.getModelo() + " " + ca.getAno());
-//									System.out.println("Placa: " + ca.getPlaca());
-//								}
-//							}
-//						}
-//					});
-//				});
-//			}
-//		});
+
+	private void mostraDevedores(ArrayList<Cliente> cl) {
+		int xxx = 0;
+		for (Cliente x : cl) {
+			if (x.getDivida() > 0.0) {
+				System.out.println("------------------------------");
+				System.out.println(x);
+				xxx = 1;
+			}
+		}
+		if (xxx == 1) {
+			System.out.println("------------------------------");
+		} else {
+			System.out.println("Não há clientes com dívidas...");
+		}
 	}
 
 	private void emitirRecibo(Cliente c, double d) {
