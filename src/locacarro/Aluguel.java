@@ -210,10 +210,12 @@ public class Aluguel {
 						
 						ca.setKm(kmsAtual);
 						ca.setSituacao(true);
-						x.setSituacao(false);
+						
+						double auxDivida = 0.0;
 
 						x.setDividaValor(divida);
 						System.out.println("Dívida atual: " + divida);
+						auxDivida = cl.getDivida();
 
 						if (vaiPagar) {
 							System.out.print("Total a pagar: ");
@@ -223,14 +225,17 @@ public class Aluguel {
 
 							if (divida <= 0) {
 								System.out.println("Troco: R$ " + -divida);
-								cl.setDivida(0.0);
+								cl.setDivida(auxDivida);
 								System.out.println("Dívida totalmente paga...");
+								x.setSituacao(false);
 							} else {
-								cl.setDivida(divida);
+								cl.setDivida(divida+auxDivida);
 							}
 						} else {
-							cl.setDivida(divida);
+							cl.setDivida(divida+auxDivida);
 						}
+						
+						emitirRecibo(cl, ca, x, kms);
 					}
 				}
 			} else {
@@ -240,8 +245,23 @@ public class Aluguel {
 			System.out.println("Cliente não existe...");
 		}
 	}
+	
+	private void emitirRecibo(Cliente cliente, Carro carro, Aluguel aluguel, double kms) throws Exception {
+		System.out.println("\n---------- Recibo ------------\n");
+		if (cliente instanceof ClienteFisico) {
+			System.out.println("Cliente: " + ((ClienteFisico) cliente).getNome());
+		} else {
+			System.out.println("Cliente: " + ((ClienteJuridico) cliente).getRazaoSocial());
+		}
+		System.out.println("Quilômetros rodados: " + kms);
+		System.out.println("Dias com o carro: " + aluguel.diasEntreDatas());
+		System.out.println("Carro: " + carro.getModelo() + " " + carro.getAno());
+		System.out.println("Placa do carro: " + carro.getPlaca());
+		System.out.println("\nValor: R$ " + aluguel.getDividaValor());
+		System.out.println("------------------------------");
+	}
 
-	public int diasEntreDatas() throws ParseException {
+	public int diasEntreDatas() throws Exception {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		Calendar dInicio = Calendar.getInstance();
 		Calendar dFim = Calendar.getInstance();
